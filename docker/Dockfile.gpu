@@ -52,7 +52,7 @@ RUN wget https://github.com/vim/vim/archive/v8.0.1555.tar.gz -O vim.tar.gz && \
                 --with-python3-config-dir=/usr/lib/python3.4/config-3.4m-x86_64-linux-gnu && \
     make -j"$(nproc)" && \
     make install && \
-    rm -rf vim-8.0.1555
+    rm -rf /tmp/vim-8.0.1555 vim.tar.gz
 
 # cmake
 WORKDIR /tmp
@@ -62,7 +62,7 @@ RUN wget https://cmake.org/files/v3.10/cmake-3.10.2.tar.gz && \
     ./configure --prefix=/usr && \
     make -j"$(nproc)" && \
     make install && \
-    rm -rf /tmp/cmake-3.10.2
+    rm -rf /tmp/cmake-3.10.2 cmake-3.10.2
 
 # install pip
 WORKDIR /tmp
@@ -71,9 +71,12 @@ RUN wget https://bootstrap.pypa.io/get-pip.py && \
     python2 get-pip.py && \
     rm get-pip.py
 
+# update pip source
+COPY docker/pip.conf.ustc /etc/pip.conf
 # python3.4 packages
 COPY docker/py35_requirements.txt /tmp
-RUN pip3 install --upgrade -r /tmp/py35_requirements.txt
+
+RUN pip3 install --no-cache-dir --upgrade -r /tmp/py35_requirements.txt
 
 # remove tmp file
 RUN cd / && rm -rf /tmp/*
