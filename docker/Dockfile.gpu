@@ -1,0 +1,74 @@
+FROM nvidia/cuda:9.0-cudnn7-devel-ubuntu16.04
+
+MAINTAINER Kejie-Wang <wang_kejie@foxmail.com>
+
+# backup sourcelist and update 163 source
+RUN cp /etc/apt/sources.list /etc/apt/sources.list.bak
+COPY docker/sources.list.ubuntu1604.163 /etc/apt/sources.list
+
+RUN apt-get update && apt-get install -y \
+   apt-transport-https \
+   autojump \
+   bc \
+   build-essential \
+   cppcheck \
+   curl \
+   debconf-utils \
+   doxygen \
+   g++ \
+   gdb \
+   git \
+   htop \
+   lcov \
+   libboost-all-dev \
+   libcurl4-openssl-dev \
+   libfreetype6-dev \
+   libncurses5-dev \
+   lsof \
+   python-dev \
+   python-software-properties \
+   python3-dev \
+   python3-software-properties \
+   proxychains \
+   realpath \
+   software-properties-common \
+   tmux \
+   unzip \
+   wget \
+   xterm \
+   zip \
+   zsh \
+   ssh
+
+ARG PACKAGE_PATH="docker/packages"
+
+# vim
+WORKDIR /tmp
+COPY $PACKAGE_PATH/vim.tar.gz /tmp
+RUN tar -zxvf vim.tar.gz && \
+    cd vim-8.0.1555 && \
+    ./configure --enable-pythoninterp \
+                --with-python-config-dir=/usr/lib/python2.7/config-x86_64-linux-gnu \
+                --enable-python3interp \
+                --with-python3-config-dir=/usr/lib/python3.4/config-3.4m-x86_64-linux-gnu && \
+    make -j"$(nproc)" && \
+    make install
+
+# cmake
+WORKDIR /tmp
+COPY $PACKAGE_PATH/cmake-3.10.2.tar.gz /tmp
+RUN tar -zxvf cmake-3.10.2.tar.gz && \
+    cd cmake-3.10.2 && \
+    ./configure --prefix=/usr && \
+    make -j"$(nproc)" && \
+    make install 
+
+# install pip
+WORKDIR /tmp
+RUN wget https://bootstrap.pypa.io/get-pip.py
+RUN python3 get-pip.py
+RUN python2 get-pip.py
+
+# python3.4 packages
+COPY docker/py34_requirements.txt /tmp
+RUN pip3 install --upgrade -r /tmp/py34_requirements.txt

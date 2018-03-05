@@ -1,0 +1,3 @@
+SHELL_PATH="$( cd "$( dirname "$0" )" && pwd )"
+bash $SHELL_PATH/../scripts/docker_into.sh
+
