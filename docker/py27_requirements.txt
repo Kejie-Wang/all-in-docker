@@ -1,4 +1,4 @@
-ipython
+ipython==5.5
 jupyter
 matplotlib
 opencv-python
@@ -8,4 +8,3 @@ protobuf
 scikit-image
 scipy
 sklearn
-tensorflow-gpu == 1.6.0
